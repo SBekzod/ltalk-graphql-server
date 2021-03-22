@@ -6,15 +6,29 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "NODE_ENV=production node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "apollo-server-express": "^2.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "firebase-admin": "^9.4.1",
+    "graphql": "^15.4.0",
+    "graphql-firestore-subscriptions": "^1.0.1",
+    "graphql-subscriptions": "^1.2.1",
+    "graphql-upload": "^11.0.0",
+    "memcached": ">=2.2.1",
+    "mysql2": "^2.2.5",
+    "php-unserialize": ">=0.0.1",
+    "upgrade": "^1.1.0",
+    "yarn": "^1.22.10"
   },
+  "type": "module",
   "devDependencies": {
     "nodemon": "^2.0.7"
   }
