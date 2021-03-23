@@ -44,12 +44,15 @@ const apolloServer = new ApolloServer({
         let user = {};
         // WHEN SUBSCRIPTION CONNECTED
         if (ctx.connection) {
-            console.log('PASSED HERE - 1')
+            console.log('browser connection results')
             //console.log(ctx.payload);
             console.warn('ssid : ' + ctx.connection.context.ssid);
             console.warn('mbid : ' + ctx.connection.context.mbid);
+
+            console.log(ctx.connection.context.mbid)
+            user.mbid = ctx.connection.context.mbid
         } else {
-            console.log('PASSED HERE - 2')
+            console.log('...wait...')
         }
 
         return {...ctx, user, db}

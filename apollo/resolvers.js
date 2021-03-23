@@ -151,6 +151,9 @@ export const resolvers = {
             const { user } = _context;
             //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
 
+            console.log(_args)
+            console.log(user)
+
             try {
                 const { input } = _args;
                 if ( user.mbid !== input.mb_id) throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", { parameter: "" });
