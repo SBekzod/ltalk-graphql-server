@@ -12,7 +12,7 @@ const __WebSession__ = {};
  * Return php deserialuzed web session data
  *
  * @param ssid
- * @eturns {Promise}
+ * @returns {Promise}
  */
 __WebSession__.getSession = (ssid) => {
     return new Promise((resolve, reject) => {

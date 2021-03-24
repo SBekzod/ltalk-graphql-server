@@ -2,9 +2,9 @@ import admin from 'firebase-admin';
 import { verifyIdToken, pubSubRegister, FirestoreJob } from "../lib/firebaseAdmin.js";
 import { ApolloError } from 'apollo-server-express';
 import { GraphQLUpload } from 'graphql-upload';
-import { withFilter } from 'graphql-subscriptions';
+import { PubSub, withFilter } from 'graphql-subscriptions';
 import { COLLECTION_PREFIX, TOPIC } from "../config.js";
-import { PubSub } from "graphql-firestore-subscriptions/dist/PubSub.js";
+//import { PubSub } from "graphql-firestore-subscriptions/dist/PubSub.js";
 
 // FIRESTORE FUNCTION
 const firestoreJob = new FirestoreJob();
@@ -18,31 +18,87 @@ export const resolvers = {
     Query: {
 
         async channels(_parent, _args, _context, _info) {
-            try {
-                const { mb_id } = _args;
-                return await firestoreJob.getChannels({ mb_id });
+            const { user } = _context;
+            //try {
+                const { mb_id, start_at, limit } = _args;
+                if (user.mbid !== mb_id && user.role !== "admin") {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                }
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+                return await firestoreJob.getChannels({ mb_id, start_at, limit });
+
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+        },
+
+        async channel(_parent, _args, _context, _info) {
+            const { user } = _context;
+            //try {
+            const { id } = _args;
+            if (user.role !== "admin") {
+                throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+            }
+
+            return await firestoreJob.getChannel(id);
+
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+        },
+
+        async channelsAdmin(_parent, _args, _context, _info) {
+            const { user } = _context;
+            //try {
+                const { mb_id, start_at, limit } = _args;
+                if (user.role !== "admin") {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                }
+
+                return await firestoreJob.getChannelsAdmin({ mb_id, start_at, limit });
+
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async messages(_parent, _args, _context, _info) {
-            try {
-                const { user } = _context;
-                //if( user.role !== 'admin') throw new ApolloError("You do not have permission.");
-
+            const { user } = _context;
+            //try {
                 const { channel_id, start_at, limit } = _args;
-                console.log(channel_id + ' + ' + start_at + ' + ' + limit);
+
                 return await firestoreJob.getMessages({ channel_id, start_at, limit });
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+        },
+
+        async users(_parent, _args, _context, _info) {
+            const { user } = _context;
+            //try {
+                const { type, start_at, limit } = _args;
+
+                if (type === "blacklist") {
+                    let mb_id = user.mbid;
+                    const user_data = await firestoreJob.getUser(mb_id);
+                    let blacklist = [];
+                    if (user_data && user_data.blacklist) {
+                        for (let i=0; i<user_data.blacklist.length; i++) {
+                            const black_info = await firestoreJob.getUser(user_data.blacklist[i]);
+                            if (black_info) blacklist.push(black_info);
+                        }
+                    }
+
+                    return blacklist;
+                }
+                throw new ApolloError('타입을 정확하게 입력해 주세요.', "TYPE_ERROR", {parameter: ""});
+
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async user(_parent, _args, _context, _info) {
-            try {
-                const { id } = _args;
-                return await firestoreJob.getUser(id);
+            const { user } = _context;
+            //try {
+                const { type, keyword } = _args;
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+                if (type === "id") return await firestoreJob.getUser(keyword);
+                if (type === "nick") return await firestoreJob.getUserByNick(keyword);
+                throw new ApolloError('타입을 정확하게 입력해 주세요.', "TYPE_ERROR", {parameter: ""});
+
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         uploads: (parent, args) => {},
@@ -53,16 +109,19 @@ export const resolvers = {
 
         async createChannel(_parent, _args, _context, _info) {
             const { user, db } = _context;
-            //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
-
-            try {
+            //try {
                 const { input } = _args;
-
+                if (user.mbid !== input.opener_mb_id && user.role !== "admin") {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                }
                 if (input.opener_mb_id === input.invitees_mb_id) {
                     throw new ApolloError("자신에게는 채팅을 할 수 없습니다.", "INVALID_USER", { parameter: "" });
                 }
-                if (await firestoreJob.isExistChannel(input.opener_mb_id, input.invitees_mb_id)) {
-                    throw new ApolloError("활성화 된 채널이 이미 존재합니다.", "EXIST_CHANNEL", { parameter: "" });
+
+                const channel = await firestoreJob.isExistChannel(input.opener_mb_id, input.invitees_mb_id);
+                if (channel) {
+                    //throw new ApolloError("활성화 된 채널이 이미 존재합니다.", "EXIST_CHANNEL", { parameter: "" });
+                    return channel;
                 }
 
                 let opener_info = await db.getUserInfo(input.opener_mb_id);
@@ -84,19 +143,25 @@ export const resolvers = {
                 // 구독자 자동 응답인 경우 (point or star 차감)
                 if (input.channel_type == "AUTO") {
                     if (! opener_info_fs) {
-                        count_channel_ticket = getTicketsPerLevel(opener_info.level);
+                        count_channel_ticket = 0; //getTicketsPerLevel(opener_info.level);
                     } else {
-                        count_channel_ticket = opener_info_fs.count_channel_ticket;
+                        //count_channel_ticket = opener_info_fs.count_channel_ticket;
+                        // 사용한 채널 생성권 증가 처리
+                        if (opener_info_fs.count_channel_ticket < getTicketsPerLevel(opener_info.level)) {
+                            count_channel_ticket = opener_info_fs.count_channel_ticket + 1;
+                        } else {
+                            throw new ApolloError("신청 제한 횟수를 초과 하였습니다.", "NO_CHANNEL_TICKET", {parameter: ""});
+                        }
                     }
                 } else {
                     if (! opener_info_fs) {
-                        count_channel_ticket = getTicketsPerLevel(opener_info.level);
+                        count_channel_ticket = 0; //getTicketsPerLevel(opener_info.level);
                     } else {
-                        // 채널 생성권 감소 처리
-                        if (opener_info_fs.count_channel_ticket > 0) {
-                            count_channel_ticket = opener_info_fs.count_channel_ticket - 1;
+                        // 사용한 채널 생성권 증가 처리
+                        if (opener_info_fs.count_channel_ticket < getTicketsPerLevel(opener_info.level)) {
+                            count_channel_ticket = opener_info_fs.count_channel_ticket + 1;
                         } else {
-                            throw new ApolloError("채팅방 생성권이 부족합니다.", "NO_CHANNEL_TICKET", {parameter: ""});
+                            throw new ApolloError("신청 제한 횟수를 초과 하였습니다.", "NO_CHANNEL_TICKET", {parameter: ""});
                         }
                     }
                 }
@@ -106,6 +171,7 @@ export const resolvers = {
                     mb_level: opener_info.level,
                     count_channel_ticket: count_channel_ticket,
                     blacklist: opener_info_fs.blacklist ? opener_info_fs.blacklist : [],
+                    channellist: opener_info_fs.channellist ? opener_info_fs.channellist : [],
                 };
                 await firestoreJob.setUser(opener_info);
 
@@ -114,49 +180,61 @@ export const resolvers = {
                         mb_id: invitees_info.mb_id,
                         mb_nick: invitees_info.name,
                         mb_level: invitees_info.level,
-                        count_channel_ticket: getTicketsPerLevel(invitees_info.level),
+                        count_channel_ticket: 0, //getTicketsPerLevel(invitees_info.level),
                         blacklist: [],
+                        channellist: [],
                     };
                     await firestoreJob.setUser(invitees_info);
                 }
 
                 return await firestoreJob.setChannel(input);
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async updateChannel(_parent, _args, _context, _info) {
-            const { user } = _context;
-            //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
-
-            try {
+            const { user, users } = _context;
+            //try {
                 const { input } = _args;
+                if ((input.mb_id && user.mbid !== input.mb_id) && user.role !== "admin") {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                }
+
+                // 채널 퇴장 처리 (unsubscribe 시 처리 되어야 함)
+                if (input.channel_id && input.is_active === "N") {
+                    let user_info = users.get(user.mbid);
+                    if (user_info) {
+                        const index = user_info.channels.indexOf(input.channel_id);
+                        if (index !== -1) user_info.channels.splice(index, 1);
+                        users.set(user.mbid, user_info);
+                    }
+                }
+
                 return await firestoreJob.setChannel({...input, mb_id: user.mbid});
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async deleteChannel(_parent, _args, _context, _info) {
             const { user } = _context;
-            //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
-
-            try {
+            //try {
                 const { id } = _args;
+                if ((false && user.mbid !== input.mb_id) && user.role !== "admin") {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                }
+
                 return await firestoreJob.deleteChannel(id);
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async createMessage(_parent, _args, _context, _info) {
             const { user } = _context;
-            //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
-
-            console.log(_args)
-            console.log(user)
-
-            try {
+            //try {
                 const { input } = _args;
-                if ( user.mbid !== input.mb_id) throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", { parameter: "" });
+                if (user.mbid !== input.mb_id && user.role !== "admin") {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                }
 
                 // FILE UPLOAD
                 if (input.file) {
@@ -170,30 +248,32 @@ export const resolvers = {
 
                 return await firestoreJob.setMessage(input);
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async deleteMessage(_parent, _args, _context, _info) {
             const { user } = _context;
-            //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
-
-            try {
+            //try {
                 const { id } = _args;
+                if (user.role !== "admin") {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                }
+
                 const info_data = await firestoreJob.getMessage(id);
                 if (info_data.storage_path) await deleteFile(info_data.storage_path);
 
                 return await firestoreJob.deleteMessage(id);
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async addBlacklist(_parent, _args, _context, _info) {
             const { user } = _context;
-            //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
-
-            try {
+            //try {
                 const { mb_id } = _args;
-                if ( user.mbid !== mb_id) throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", { parameter: "" });
+                if (! user.mbid) {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", { parameter: "" });
+                }
 
                 let my_data = await firestoreJob.getUser(user.mbid);
                 if (! my_data.blacklist) my_data.blacklist = [];
@@ -202,32 +282,31 @@ export const resolvers = {
 
                 return {...my_data};
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async removeBlacklist(_parent, _args, _context, _info) {
             const { user } = _context;
-            //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
-
-            try {
+            //try {
                 const { mb_id } = _args;
-                if ( user.mbid !== mb_id) throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", { parameter: "" });
+                if (! user.mbid) {
+                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", { parameter: "" });
+                }
 
                 let my_data = await firestoreJob.getUser(user.mbid);
                 if (! my_data.blacklist) my_data.blacklist = [];
-                if (my_data.blacklist.indexOf(mb_id) !== -1) my_data.blacklist.pop(mb_id);
+                const index = my_data.blacklist.indexOf(mb_id);
+                if (index !== -1) my_data.blacklist.splice(index, 1);
                 await firestoreJob.setUser(my_data);
 
                 return {...my_data};
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         async refillChannelTicket(_parent, _args, _context, _info) {
             const { req, user, db } = _context;
-            //if( user.role !== 'admin') throw new ApolloError('You do not have permission');
-
-            try {
+            //try {
                 const { type } = _args; // point or star
                 const refill_point = 30000;
 
@@ -255,13 +334,13 @@ export const resolvers = {
                 }
 
                 let my_data = await firestoreJob.getUser(user.mbid);
-                let count_channel_ticket = getTicketsPerLevel(my_data.mb_level);
+                let count_channel_ticket = 0; //getTicketsPerLevel(my_data.mb_level);
                 my_data = {...my_data, count_channel_ticket: count_channel_ticket};
                 await firestoreJob.setUser(my_data);
 
                 return {...my_data};
 
-            } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
+            //} catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
 
         uploadFile: async (parent, {file}) => {
@@ -296,11 +375,6 @@ export const resolvers = {
     Subscription: {
 
         updateChannel: {
-            resolve: (payload, args, context, info) => {
-                // console.warn('payload', payload, context, info)
-                // Manipulate and return the new value
-                return payload;
-            },
             subscribe: withFilter(
                 (_parent, _args, _context, _info) => {
                     const { mb_id } = _args;
@@ -315,18 +389,37 @@ export const resolvers = {
                         return false;
                     }
                 },
-            )
-        },
-
-        updateMessage: {
+            ),
             resolve: (payload, args, context, info) => {
-                // console.warn('payload', payload, context, info)
+                //console.warn('payload', payload, context, info)
                 // Manipulate and return the new value
                 return payload;
             },
+        },
+
+        updateMessage: {
             subscribe: withFilter(
                 (_parent, _args, _context, _info) => {
                     const { channel_id } = _args;
+                    const { user, users } = _context;
+
+                    console.log('subscribe ---------------------------------');
+                    // 채널 입장 처리
+                    if (users && user.mbid) {
+                        let user_info = users.get(user.mbid);
+                        if (user_info) {
+                            if (user_info.channels.indexOf(channel_id) === -1) user_info.channels.push(channel_id);
+                            users.set(user.mbid, user_info);
+                        }
+                    }
+                    // firestoreJob.getUser(user.mbid).then((user_info) => {
+                    //     if (!user_info.channellist) user_info.channellist = [];
+                    //     if (user_info.channellist.indexOf(channel_id) === -1) {
+                    //         user_info.channellist.push(channel_id);
+                    //         firestoreJob.setUser(user_info);
+                    //     }
+                    // });
+
                     return ps.asyncIterator(TOPIC.UPDATE_MESSAGE);
                 },
                 (payload, variables) => {
@@ -337,60 +430,94 @@ export const resolvers = {
                         return false;
                     }
                 },
-            )
-        },
-
-        updateChannelAdmin: {
+            ),
+            unsubscribe: () => {
+                console.log('unsubscribe ===============================');
+            },
             resolve: (payload, args, context, info) => {
-                // console.warn('payload', payload, context, info)
+                //console.warn('payload', payload, context, info)
                 // Manipulate and return the new value
                 return payload;
             },
+        },
+
+        updateChannelAdmin: {
             subscribe: withFilter(
                 (_parent, _args, _context, _info) => {
                     const { mb_id } = _args;
                     return ps.asyncIterator(TOPIC.UPDATE_CHANNEL);
                 },
                 (payload, variables) => {
-                    // 전체 채널 구독
-                    return true;
+                    if (variables.mb_id) {
+                        // 내가 속한 채널 만 구독
+                        if ((payload.opener_mb_id && payload.opener_mb_id === variables.mb_id)
+                            || (payload.invitees_mb_id && payload.invitees_mb_id === variables.mb_id)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        // 전체 채널 구독
+                        return true;
+                    }
                 },
-            )
-        },
-
-        updateMessageAdmin: {
+            ),
             resolve: (payload, args, context, info) => {
                 // console.warn('payload', payload, context, info)
                 // Manipulate and return the new value
                 return payload;
             },
+        },
+
+        updateMessageAdmin: {
             subscribe: withFilter(
                 (_parent, _args, _context, _info) => {
                     const { channel_id } = _args;
                     return ps.asyncIterator(TOPIC.UPDATE_MESSAGE);
                 },
                 (payload, variables) => {
-                    // 전체 채널의 메시지 구독
-                    return true;
+                    if (variables.channel_id) {
+                        // 입장한 채널의 메시지 만 구독
+                        if (payload.channel_id && payload.channel_id === variables.channel_id) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        // 전체 채널의 메시지 구독
+                        return true;
+                    }
                 },
-            )
+            ),
+            resolve: (payload, args, context, info) => {
+                // console.warn('payload', payload, context, info)
+                // Manipulate and return the new value
+                return payload;
+            },
         },
 
     },
     // Type -------------------------------------------------------------------------------------
     Channel: {
-        messages: async (_parent, _args, _context, _info) => {
+        users: async (_parent, _args, _context, _info) => {
             try {
-                const { id } = _parent;
-                return await firestoreJob.getChannelMessages(id);
+                const { opener_mb_id, invitees_mb_id } = _parent;
+                const { type } = _args;
+                const { user } = _context;
+                if (type == "*") {
+                    return await firestoreJob.getChannelUsers([opener_mb_id, invitees_mb_id]);
+                } else {
+                    const others_mb_id = user.mbid === opener_mb_id ? invitees_mb_id : opener_mb_id;
+                    return await firestoreJob.getChannelUsers([others_mb_id]);
+                }
 
             } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
-        users: async (_parent, _args, _context, _info) => {
+        messages: async (_parent, _args, _context, _info) => {
             try {
-                const { user } = _context;
-                let others_mb_id = user.mbid === _parent.opener_mb_id ? _parent.invitees_mb_id : _parent.opener_mb_id;
-                return await firestoreJob.getChannelUsers(others_mb_id);
+                const { id } = _parent;
+                const { limit } = _args;
+                return await firestoreJob.getChannelMessages(id, limit);
 
             } catch (e) { throw new ApolloError(e, "INTERNAL_SERVER_ERROR", { parameter: "" }); }
         },
@@ -405,15 +532,15 @@ export const resolvers = {
 const getTicketsPerLevel = (level) => {
     let count_channel_ticket = 0;
     switch (level) {
-        case 1 : count_channel_ticket = 10; break;
-        case 2 : count_channel_ticket = 20; break;
-        case 3 : count_channel_ticket = 30; break;
-        case 4 : count_channel_ticket = 40; break;
-        case 5 : count_channel_ticket = 50; break;
-        case 6 : count_channel_ticket = 60; break;
-        case 7 : count_channel_ticket = 70; break;
-        case 8 : count_channel_ticket = 80; break;
-        case 9 : count_channel_ticket = 90; break;
+        case 1 : count_channel_ticket = 3; break;
+        case 2 : count_channel_ticket = 5; break;
+        case 3 : count_channel_ticket = 10; break;
+        case 4 : count_channel_ticket = 15; break;
+        case 5 : count_channel_ticket = 20; break;
+        case 6 : count_channel_ticket = 25; break;
+        case 7 : count_channel_ticket = 30; break;
+        case 8 : count_channel_ticket = 35; break;
+        case 9 : count_channel_ticket = 40; break;
         case 255 : count_channel_ticket = 1000; break;
     }
 

@@ -22,8 +22,8 @@ export const typeDefs = gql`
     invitees_last_message_index: Int
     invitees_last_message_date: String
     
-    users: [User]
-    messages: [Message]
+    users(type: String = ""): [User]
+    messages(limit: Int = 5): [Message]
   }
   
   type Message {
@@ -46,6 +46,7 @@ export const typeDefs = gql`
     count_channel_ticket: Int
     
     blacklist: [String]
+    channellist: [String]
   }
     
   type File {
@@ -59,11 +60,14 @@ export const typeDefs = gql`
   ########################################################
   type Query {
     channel(id: ID!): Channel
-    channels(mb_id: String!): [Channel]
+    channels(mb_id: String!, start_at: Int = 2000000000, limit: Int = 100): [Channel]
+    channelsAdmin(mb_id: String = "", start_at: Int = 2000000000, limit: Int = 30): [Channel]
+    
     message(id: ID!): Message
-    messages(channel_id: String!, start_at: Int = 100000, limit: Int = 20): [Message]
-    user(id: ID!): User
-    users(type: String!): [User]
+    messages(channel_id: String!, start_at: Int = 100000, limit: Int = 300): [Message]
+    
+    user(type: String!, keyword: String!): User
+    users(type: String!, start_at: Int = 2000000000, limit: Int = 30): [User]
     
     uploads: [File]
   }
@@ -76,6 +80,7 @@ export const typeDefs = gql`
     
     channel_id: String
     is_active: String
+    is_auto_init: String
   }
   
   input MessageInput {
@@ -106,8 +111,8 @@ export const typeDefs = gql`
     updateChannel(mb_id: String!): Channel
     updateMessage(channel_id: String!): Message
     
-    updateChannelAdmin: Channel
-    updateMessageAdmin: Message
+    updateChannelAdmin(mb_id: String): Channel
+    updateMessageAdmin(channel_id: String): Message
   }
   
 `
