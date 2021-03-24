@@ -21,9 +21,11 @@ export const resolvers = {
             const { user } = _context;
             //try {
                 const { mb_id, start_at, limit } = _args;
-                if (user.mbid !== mb_id && user.role !== "admin") {
-                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
-                }
+                console.log('AAAAAAAA', _args)
+                console.log('CCCCCCCC', user)
+                // if (user.mbid !== mb_id && user.role !== "admin") {
+                //     throw new ApolloError('권한이 없습니다.(1)', "PERMISSION_ERROR", {parameter: ""});
+                // }
 
                 return await firestoreJob.getChannels({ mb_id, start_at, limit });
 
@@ -35,7 +37,7 @@ export const resolvers = {
             //try {
             const { id } = _args;
             if (user.role !== "admin") {
-                throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                throw new ApolloError('권한이 없습니다.(2)', "PERMISSION_ERROR", {parameter: ""});
             }
 
             return await firestoreJob.getChannel(id);
@@ -48,7 +50,7 @@ export const resolvers = {
             //try {
                 const { mb_id, start_at, limit } = _args;
                 if (user.role !== "admin") {
-                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                    throw new ApolloError('권한이 없습니다.(3)', "PERMISSION_ERROR", {parameter: ""});
                 }
 
                 return await firestoreJob.getChannelsAdmin({ mb_id, start_at, limit });
@@ -112,7 +114,7 @@ export const resolvers = {
             //try {
                 const { input } = _args;
                 if (user.mbid !== input.opener_mb_id && user.role !== "admin") {
-                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                    throw new ApolloError('권한이 없습니다.(4)', "PERMISSION_ERROR", {parameter: ""});
                 }
                 if (input.opener_mb_id === input.invitees_mb_id) {
                     throw new ApolloError("자신에게는 채팅을 할 수 없습니다.", "INVALID_USER", { parameter: "" });
@@ -197,7 +199,7 @@ export const resolvers = {
             //try {
                 const { input } = _args;
                 if ((input.mb_id && user.mbid !== input.mb_id) && user.role !== "admin") {
-                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                    throw new ApolloError('권한이 없습니다.(5)', "PERMISSION_ERROR", {parameter: ""});
                 }
 
                 // 채널 퇴장 처리 (unsubscribe 시 처리 되어야 함)
@@ -232,9 +234,9 @@ export const resolvers = {
             const { user } = _context;
             //try {
                 const { input } = _args;
-                if (user.mbid !== input.mb_id && user.role !== "admin") {
-                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
-                }
+                // if (user.mbid !== input.mb_id && user.role !== "admin") {
+                //     throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                // }
 
                 // FILE UPLOAD
                 if (input.file) {
@@ -256,7 +258,7 @@ export const resolvers = {
             //try {
                 const { id } = _args;
                 if (user.role !== "admin") {
-                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", {parameter: ""});
+                    throw new ApolloError('권한이 없습니다.(6)', "PERMISSION_ERROR", {parameter: ""});
                 }
 
                 const info_data = await firestoreJob.getMessage(id);
@@ -272,7 +274,7 @@ export const resolvers = {
             //try {
                 const { mb_id } = _args;
                 if (! user.mbid) {
-                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", { parameter: "" });
+                    throw new ApolloError('권한이 없습니다.(7)', "PERMISSION_ERROR", { parameter: "" });
                 }
 
                 let my_data = await firestoreJob.getUser(user.mbid);
@@ -290,7 +292,7 @@ export const resolvers = {
             //try {
                 const { mb_id } = _args;
                 if (! user.mbid) {
-                    throw new ApolloError('권한이 없습니다.', "PERMISSION_ERROR", { parameter: "" });
+                    throw new ApolloError('권한이 없습니다.(8)', "PERMISSION_ERROR", { parameter: "" });
                 }
 
                 let my_data = await firestoreJob.getUser(user.mbid);

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:master" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cc5d45a1-862e-4a68-a5c2-6e4e91bb2b2f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/ltalk-graphql-server.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.local" beforeDir="false" afterPath="$PROJECT_DIR$/.env.local" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apollo/resolvers.js" beforeDir="false" afterPath="$PROJECT_DIR$/apollo/resolvers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="ProjectId" id="1q6UFiJ45MAkllv9Pdrp0QH8dnu" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="dart.analysis.tool.window.visible" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="web-ide.project.structure" />
+    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2020.1.1\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\bekzo\Desktop\onUse\NODE.js\ltalk-graphql-server" />
+    </key>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cc5d45a1-862e-4a68-a5c2-6e4e91bb2b2f" name="Default Changelist" comment="" />
+      <created>1616399431961</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1616399431961</updated>
+      <workItem from="1616399433226" duration="14256000" />
+      <workItem from="1616565618918" duration="16487000" />
+      <workItem from="1616595272646" duration="1888000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="93" y="93" width="2886" height="1502" key="DiffContextDialog" timestamp="1616573902902">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="93" y="93" width="2886" height="1502" key="DiffContextDialog/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616573902902" />
+    <state x="1317" y="599" key="FileChooserDialogImpl" timestamp="1616407070483">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1317" y="599" key="FileChooserDialogImpl/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616407070483" />
+    <state width="3029" height="496" key="GridCell.Tab.0.bottom" timestamp="1616402663585">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state width="3029" height="496" key="GridCell.Tab.0.bottom/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616402663585" />
+    <state width="3029" height="496" key="GridCell.Tab.0.center" timestamp="1616402663584">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state width="3029" height="496" key="GridCell.Tab.0.center/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616402663584" />
+    <state width="3029" height="496" key="GridCell.Tab.0.left" timestamp="1616402663584">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state width="3029" height="496" key="GridCell.Tab.0.left/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616402663584" />
+    <state width="3029" height="496" key="GridCell.Tab.0.right" timestamp="1616402663584">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state width="3029" height="496" key="GridCell.Tab.0.right/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616402663584" />
+    <state x="1282" y="547" key="RollbackChangesDialog" timestamp="1616500741062">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1282" y="547" key="RollbackChangesDialog/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616500741062" />
+    <state x="1045" y="489" key="SettingsEditor" timestamp="1616399462055">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1045" y="489" key="SettingsEditor/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616399462055" />
+    <state x="1129" y="577" key="Vcs.Push.Dialog.v2" timestamp="1616501010382">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1129" y="577" key="Vcs.Push.Dialog.v2/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616501010382" />
+    <state x="1346" y="758" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1616401125039">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1346" y="758" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616401125039" />
+    <state x="2025" y="600" width="578" height="534" key="find.popup" timestamp="1616595493794">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="2025" y="600" width="578" height="534" key="find.popup/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616595493794" />
+    <state x="1302" y="557" key="git4idea.branch.GitSmartOperationDialog" timestamp="1616572857466">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1302" y="557" key="git4idea.branch.GitSmartOperationDialog/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616572857466" />
+    <state x="1193" y="403" key="run.anything.popup" timestamp="1616572355326">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1193" y="403" key="run.anything.popup/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616572355326" />
+    <state x="1199" y="387" width="672" height="678" key="search.everywhere.popup" timestamp="1616582546028">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1199" y="387" width="672" height="678" key="search.everywhere.popup/0.0.3072.1688/3840.0.1920.1040@0.0.3072.1688" timestamp="1616582546028" />
+  </component>
+</project>
