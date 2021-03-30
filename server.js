@@ -3,8 +3,9 @@ import express from 'express';
 import {ApolloServer} from 'apollo-server-express';
 import {graphqlUploadExpress} from "graphql-upload";
 import {schema} from './apollo/schema.js';
-import {FirestoreJob, initialAdmin, verifyIdToken} from './lib/firebaseAdmin.js';
+import {FirestoreJob, initialAdmin} from './lib/firebaseAdmin.js';
 import {Database} from './lib/database.js';
+import Mongodb from 'mongodb';
 // defination for dotenv package
 import {resolve} from "path"
 import {config} from "dotenv"
@@ -13,14 +14,23 @@ config({path: resolve(process.env.NODE_ENV === 'production' ? "./.env" : "./.env
 
 
 // CONNECTING TO ALL FORMS OF DATABASES AND FIRESTORE ADMIN
-// mysql database of LTALK
+// MySQL database of LTALK
 const db = new Database();
 try {
     await db.getDatabase();
-    console.log('MYSQL connection succeed')
+    console.log('Connected to MySQL of LTALK app')
 } catch (err) {
     console.log('ERROR MySQL connections: ' + err.message)
 }
+// Mongodb database of complex
+let mdb
+Mongodb.connect(process.env.CONNECTIONURL, {useNewUrlParser: true, useUnifiedTopology: true}, function (err, client) {
+    if (err) throw new Error(err)
+    else {
+        mdb = client.db()
+        console.log('Connected to Mongodb of Complex app')
+    }
+})
 // initializing of FB admin connection
 initialAdmin();
 // defining firestore operations
@@ -33,7 +43,7 @@ const formatError = (err) => {
     console.error("Path:", err.path)
     console.error("Message:", err.message)
     console.error("Code:", err.extensions.code)
-    console.error("Original Error", err.originalError)
+    console.error("Original Error:", err.originalError)
     return err
 };
 
@@ -46,63 +56,55 @@ const apolloServer = new ApolloServer({
         let user = {};
         // WHEN SUBSCRIPTION CONNECTED
         if (ctx.connection) {
-            console.log(ctx.connection.context)
-            console.log('ctx.connection ---------------------------------------');
+            // console.log(ctx.connection.context)
+            console.log('------------------- context: ctx.connection --------------------');
             console.warn('ssid : ' + ctx.connection.context.ssid);
             console.warn('mbid : ' + ctx.connection.context.mbid);
-
             user = {
                 ssid: ctx.connection.context.ssid,
                 mbid: ctx.connection.context.mbid,
                 name: "no", level: "no",
                 ip: "no", role: "no"
             }
-
-
-
             if (!users.has(user.mbid)) {
                 users.set(user.mbid, {name: user.name, level: user.level, ip: user.ip, role: user.role, channels: []});
             }
 
-            console.log(user)
-            return {...ctx, user, users};
-
+            // console.log(user)
+            // return {...ctx, user, users};
         } else {
-            console.log('ctx.req ---------------------------------------');
+            console.log('----------------- context: ctx.req ----------------------');
             //console.warn('context is', ctx.req);
             console.warn('ssid :: ' + ctx.req.headers['ssid']);
             console.warn('mbid :: ' + ctx.req.headers['mbid']);
-
             user = {
-                ssid: ctx.req['ssid'],
-                mbid: ctx.req['mbid'],
+                ssid: ctx.req.headers['ssid'],
+                mbid: ctx.req.headers['mbid'],
                 name: "no", level: "no",
                 ip: "no", role: "no"
             }
-
+            // console.log(user)
             // USER INFORMATION
             // if (ctx.req.headers.cookie) {
             //     const cookie = JSON.parse(decodeURIComponent(ctx.req.headers.cookie.replace('auth=', '')));
             //     // console.warn('context',cookie);
             //     user = await verifyIdToken(cookie.token);
             // }
-
-
         }
 
-        return {...ctx, user, users, db};
+        return {...ctx, user, users, db, mdb};
     },
 
     subscriptions: {
         onConnect: (connectionParams, webSocket, context) => {
-            console.log('Connected! ------------------------------------------------');
+            console.log('-------------------- subscriptions: Connected! ----------------------------');
             return {
                 ssid: connectionParams.ssid,
                 mbid: connectionParams.mbid,
             };
         },
         onDisconnect: (webSocket, context) => {
-            console.log('Disconnected! ------------------------------------------------');
+            console.log('---------------------- subscriptions: Disconnected! --------------------------');
             context.initPromise.then((data) => {
                 //console.log(users.entries());
                 const user_info = users.get(data.mbid);
@@ -134,4 +136,4 @@ apolloServer.applyMiddleware({app});
 const server = http.createServer(app);
 apolloServer.installSubscriptionHandlers(server);
 // starting to listen
-server.listen({port: 4000}, () => console.log(`🚀 Server ready at http://localhost:4000${apolloServer.graphqlPath}`));
+server.listen({port: 4000}, () => console.log(`🚀 Server ready at http://localhost:4000${apolloServer.graphqlPath} 🚀`));
