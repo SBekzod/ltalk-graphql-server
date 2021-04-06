@@ -25,8 +25,6 @@ export const resolvers = {
             const {user} = _context;
             try {
                 const {mb_id, start_at, limit} = _args;
-                // console.log('AAAAAAAA', _args)
-                // console.log('CCCCCCCC', user)
 
                 if (user.mbid !== mb_id && user.role !== "admin") {
                     throw new ApolloError('권한이 없습니다.(1)', "PERMISSION_ERROR", {parameter: ""});
@@ -439,6 +437,8 @@ export const resolvers = {
         updateChannel: {
             subscribe: withFilter(
                 (_parent, _args, _context, _info) => {
+                    console.log('** Send Updated Channel on PubSub into subscribed, requested and right user **')
+
                     const {mb_id} = _args;
                     return ps.asyncIterator(TOPIC.UPDATE_CHANNEL);
                 },
@@ -465,7 +465,7 @@ export const resolvers = {
                     const {channel_id} = _args;
                     const {user, users} = _context;
 
-                    console.log('***** SUBSCRIPTION updateMessage reached server ******')
+                    console.log('** Send Updated Message on PubSub into subscribed, requested and right user **')
                     // console.log('subscribe ---------------------------------');
                     // 채널 입장 처리
                     if (users && user.mbid) {
