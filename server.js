@@ -9,6 +9,7 @@ import Mongodb from 'mongodb';
 // defination for dotenv package
 import {resolve} from "path"
 import {config} from "dotenv"
+import cors from 'cors'
 
 config({path: resolve(process.env.NODE_ENV === 'production' ? "./.env" : "./.env.local")});
 
@@ -130,6 +131,23 @@ app.use(
     '/graphql',
     graphqlUploadExpress({maxFileSize: 10000000, maxFiles: 10}),
 )
+
+
+// ENABLE CORS
+const whitelist = [
+    'http://localhost:3000',
+    'http://localhost:8080'
+];
+const corsOptions = {
+    credentials: true, // This is important.
+    origin: (origin, callback) => {
+        // if (whitelist.includes(origin))
+        //     return callback(null, true)
+        // callback(new Error('Not allowed by CORS OPTIONS'));
+        return callback(null, true);
+    }
+}
+app.use(cors(corsOptions));
 
 // joining two servers: EXPRESS VS APOLLO
 apolloServer.applyMiddleware({app});
